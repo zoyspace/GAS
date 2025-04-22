@@ -1,0 +1,35 @@
+function sendToLine(message="GASからテスト送信します。") {
+    const channelAccessToken = PropertiesService.getScriptProperties().getProperty("lineMessagingApiToken"); // Messaging API用トークン
+    const userId = PropertiesService.getScriptProperties().getProperty("lineUserId"); // 送信先ユーザーのID（プッシュメッセージ用）
+    const url = "https://api.line.me/v2/bot/message/push"; // Messaging APIのエンドポイント
+
+    const payload = {
+        to: userId,
+        messages: [
+            {
+                type: "text",
+                text: message
+            }
+        ]
+    };
+
+    const options = {
+        method: "post",
+        contentType: "application/json",
+        payload: JSON.stringify(payload),
+        headers: {
+            "Authorization": "Bearer " + channelAccessToken
+        }
+    };
+
+    const response = UrlFetchApp.fetch(url, options);
+
+    if (response.getResponseCode() === 200) {
+        Logger.log("LINEにメッセージを送信しました。");
+    } else {
+        Logger.log("Messaging APIによるメッセージ送信に失敗しました。ステータスコード: " + response.getResponseCode());
+        Logger.log(response.getContentText());
+
+    }
+}
+
